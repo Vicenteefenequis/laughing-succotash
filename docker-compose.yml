@@ -1,0 +1,70 @@
+version: "3"
+
+services:
+  d_api-banco-go:
+    container_name: d_api-banco-go
+    build: .docker/go
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/go/src
+    depends_on:
+      - d_banco-fila
+      - d_api-banco
+      - d_redis
+      - d_mysql_db
+    networks:
+      - d-net
+  d_mysql_db:
+    container_name: d_mysql_db
+    build: .docker/mysql
+    command: --innodb-use-native-aio=0
+    restart: always
+    tty: true
+    ports:
+      - "33060:3306"
+    volumes:
+      - ./.docker/dbdata:/var/lib/mysql
+      - ./.docker/mysql:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - d-net
+  d_api-banco:
+    container_name: d_api-banco
+    build: .docker/api-banco
+    volumes:
+      - .docker/api-banco:/api
+      - .docker/api-banco/node_modules:/api/node_modules
+    ports:
+      - "3000:3000"
+    networks:
+      - d-net
+
+  d_banco-fila:
+    container_name: d_banco-fila
+    image: "rabbitmq:3.8-management"
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=fYOaGmG67Py+011XTAM3iw==
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_DEFAULT_VHOST=/
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - d-net
+
+  d_redis:
+    container_name: d_redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    depends_on:
+      - d_banco-fila
+    networks:
+      - d-net
+
+networks:
+  d-net:
+    driver: bridge
