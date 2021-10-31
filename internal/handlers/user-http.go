@@ -21,7 +21,7 @@ func (h *UserHTTPHandler) Get(c echo.Context) error {
 	user, err := h.userService.FindOne(c.Param("id"))
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, buildMessage("error", err.Error()))
+		c.JSON(http.StatusBadRequest, buildMessage("error", err.Error()))
 		return err
 	}
 
