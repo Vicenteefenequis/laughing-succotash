@@ -25,17 +25,15 @@ func main() {
 	service := service.NewUserService(repo)
 	handler := handlers.NewHttpHandler(service)
 
-
 	e := echo.New()
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-
 	userHandler := e.Group("/user")
 	userHandler.POST("", handler.Create)
+	userHandler.GET("/:id", handler.Get)
 
 	e.Logger.Fatal(e.Start(":8080"))
 
 }
-
