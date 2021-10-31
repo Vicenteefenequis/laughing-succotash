@@ -31,7 +31,12 @@ func (u *User) FindAll() ([]domain.User, error) {
 }
 
 func (u *User) FindOne(id string) (*domain.User, error) {
-	return nil, nil
+	_user, err := u.repository.Get(id)
+
+	if err != nil {
+		return &domain.User{}, err
+	}
+	return _user, nil
 }
 
 func (u *User) Delete(id string) error {
