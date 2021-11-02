@@ -4,17 +4,19 @@ import (
 	"github.com/labstack/echo/v4"
 	"laughing-succostash/internal/core/domain"
 	"laughing-succostash/internal/core/ports/service"
-	"laughing-succostash/internal/validator"
+	validator_port "laughing-succostash/internal/core/ports/validator"
 	"net/http"
 )
 
 type UserHTTPHandler struct {
 	userService service_port.User
+	validator   validator_port.UserValidator
 }
 
-func NewHttpHandler(bankService service_port.User) *UserHTTPHandler {
+func NewUserHttpHandler(bankService service_port.User, validator validator_port.UserValidator) *UserHTTPHandler {
 	return &UserHTTPHandler{
 		userService: bankService,
+		validator:   validator,
 	}
 }
 
@@ -38,8 +40,7 @@ func (h *UserHTTPHandler) Create(c echo.Context) error {
 		return err
 	}
 
-	userValidator := validator.NewUserValidator()
-	errorValidators := userValidator.Validate(u)
+	errorValidators := h.validator.Validate(u)
 
 	if len(errorValidators) != 0 {
 		c.JSON(http.StatusBadRequest, buildMessage("errors", errorValidators))
