@@ -33,6 +33,7 @@ func main() {
 	userHandler := e.Group("/user")
 	userHandler.POST("", handler.Create)
 	userHandler.GET("/:id", handler.Get)
+	userHandler.DELETE("/:id", handler.Delete)
 
 	e.Logger.Fatal(e.Start(":8080"))
 
