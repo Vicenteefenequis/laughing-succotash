@@ -24,13 +24,14 @@ func (r *User) Save(u domain.User) (*domain.User, error) {
 	r.db.First(&_user, "id = ?", u.ID)
 
 	if _user.ID != "" {
-		err := r.db.Model(&_user).Updates(u).Error
 
-		if err != nil {
-			return &domain.User{}, errors.New(apperrors.IllegalOperation, err, "failed", "fail to update user on database")
+		tx := r.db.Model(&_user).UpdateColumns(&u)
+
+		if tx.Error != nil {
+			return &domain.User{}, errors.New(apperrors.IllegalOperation, tx.Error, "failed", "fail to update user on database")
 		}
 
-		return &u, nil
+		return &_user, nil
 	}
 
 	err := r.db.Create(&u).Error
@@ -71,7 +72,7 @@ func (r *User) FindAll() ([]domain.User, error) {
 	result := r.db.Find(&users)
 
 	if result.Error != nil {
-		return []domain.User{}, nil
+		return []domain.User{}, errors.New(apperrors.EmptyResult, result.Error, "User empty result", "User empty result")
 	}
 
 	return users, nil
