@@ -26,6 +26,10 @@ func main() {
 	serviceUser := service.NewUserService(repoUser)
 	handlerUser := handlers.NewUserHttpHandler(serviceUser)
 
+	repoCategory := repositories.NewCategoryRepository(db)
+	serviceCategory := service.NewCategoryService(repoCategory)
+	handlerCategory := handlers.NewCategoryHttpHandler(serviceCategory)
+
 	e := echo.New()
 
 	e.Use(middleware.Logger())
@@ -37,6 +41,13 @@ func main() {
 	userHandler.GET("/:id", handlerUser.Get)
 	userHandler.DELETE("/:id", handlerUser.Delete)
 	userHandler.PUT("", handlerUser.Update)
+
+	categoryHandler := e.Group("category")
+	categoryHandler.POST("", handlerCategory.Create)
+	categoryHandler.GET("", handlerCategory.FindAll)
+	categoryHandler.GET("/:id", handlerCategory.Get)
+	categoryHandler.DELETE("/:id", handlerCategory.Delete)
+	categoryHandler.PUT("", handlerCategory.Update)
 
 	e.Logger.Fatal(e.Start(":8080"))
 
