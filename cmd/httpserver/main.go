@@ -35,6 +35,7 @@ func main() {
 
 	userHandler := e.Group("/user")
 	userHandler.POST("", handlerUser.Create)
+	userHandler.GET("", handlerUser.FinAll)
 	userHandler.GET("/:id", handlerUser.Get)
 	userHandler.DELETE("/:id", handlerUser.Delete)
 
