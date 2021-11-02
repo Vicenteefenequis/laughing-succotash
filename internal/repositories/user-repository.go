@@ -43,6 +43,13 @@ func (r *User) Save(u domain.User) (*domain.User, error) {
 
 }
 func (r *User) Delete(id string) error {
+
+	tx := r.db.Where("id", id).Delete(&domain.User{})
+
+	if tx.Error != nil {
+		return tx.Error
+	}
+
 	return nil
 }
 
