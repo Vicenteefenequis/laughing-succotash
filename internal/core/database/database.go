@@ -48,6 +48,7 @@ func (db *Database) Connect() *gorm.DB {
 
 	db.Db = connection
 	db.Db.AutoMigrate(&domain.User{})
+	db.Db.AutoMigrate(&domain.Category{})
 
 	return connection
 }
