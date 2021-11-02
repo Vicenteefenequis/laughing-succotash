@@ -65,3 +65,14 @@ func (h *UserHTTPHandler) Delete(c echo.Context) error {
 	}
 	return c.NoContent(http.StatusNoContent)
 }
+
+func (h *UserHTTPHandler) FinAll(c echo.Context) error {
+	users, err := h.userService.FindAll()
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, buildMessage("err", err.Error()))
+		return err
+	}
+
+	return c.JSON(http.StatusOK, buildMessage("data", users))
+}
