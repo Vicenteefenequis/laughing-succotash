@@ -40,6 +40,12 @@ func (u *User) FindOne(id string) (*domain.User, error) {
 }
 
 func (u *User) Delete(id string) error {
+	err := u.repository.Delete(id)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 
 }
