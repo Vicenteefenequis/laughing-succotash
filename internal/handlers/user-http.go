@@ -55,5 +55,12 @@ func (h *UserHTTPHandler) Create(c echo.Context) error {
 	c.JSON(http.StatusCreated, buildMessage("data", user))
 
 	return nil
+}
 
+func (h *UserHTTPHandler) Delete(c echo.Context) error {
+	err := h.userService.Delete(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, buildMessage("error", err.Error()))
+	}
+	return c.NoContent(http.StatusNoContent)
 }
