@@ -66,7 +66,7 @@ func (h *UserHTTPHandler) Delete(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func (h *UserHTTPHandler) FinAll(c echo.Context) error {
+func (h *UserHTTPHandler) FindAll(c echo.Context) error {
 	users, err := h.userService.FindAll()
 
 	if err != nil {
