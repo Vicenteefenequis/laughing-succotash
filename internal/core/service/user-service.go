@@ -27,7 +27,13 @@ func (u *User) Create(user domain.User) (*domain.User, error) {
 }
 
 func (u *User) FindAll() ([]domain.User, error) {
-	return nil, nil
+	_users, err := u.repository.FindAll()
+
+	if err != nil {
+		return []domain.User{}, nil
+	}
+
+	return _users, nil
 }
 
 func (u *User) FindOne(id string) (*domain.User, error) {
