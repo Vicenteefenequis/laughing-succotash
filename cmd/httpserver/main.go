@@ -8,7 +8,6 @@ import (
 	"laughing-succostash/internal/core/service"
 	"laughing-succostash/internal/handlers"
 	"laughing-succostash/internal/repositories"
-	"laughing-succostash/internal/validator"
 	"log"
 )
 
@@ -25,8 +24,7 @@ func main() {
 
 	repoUser := repositories.NewUserRepository(db)
 	serviceUser := service.NewUserService(repoUser)
-	validatorUser := validator.NewUserValidator()
-	handlerUser := handlers.NewUserHttpHandler(serviceUser, validatorUser)
+	handlerUser := handlers.NewUserHttpHandler(serviceUser)
 
 	e := echo.New()
 
@@ -38,6 +36,7 @@ func main() {
 	userHandler.GET("", handlerUser.FindAll)
 	userHandler.GET("/:id", handlerUser.Get)
 	userHandler.DELETE("/:id", handlerUser.Delete)
+	userHandler.PUT("", handlerUser.Update)
 
 	e.Logger.Fatal(e.Start(":8080"))
 
