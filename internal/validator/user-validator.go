@@ -41,7 +41,7 @@ func (u *UserValidator) Validate(user *domain.User) []string {
 		return []string{err.Error()}
 	}
 
-	if !isTypeValid(user.Type) {
+	if !u.IsTypeValid(user.Type) {
 		return []string{"Type must be a client or store"}
 	}
 
@@ -96,7 +96,7 @@ func (u *UserValidator) RegisterTagRequired() error {
 	return nil
 }
 
-func isTypeValid(_type domain.Type) bool {
+func (u *UserValidator) IsTypeValid(_type domain.Type) bool {
 	if _type == "client" || _type == "store" {
 		return true
 	}

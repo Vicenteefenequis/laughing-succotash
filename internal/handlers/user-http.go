@@ -89,11 +89,10 @@ func (h *UserHTTPHandler) Update(c echo.Context) error {
 		return err
 	}
 
-	errorValidators := ValidatorHandler(u)
+	validator := validator.NewUserValidator()
 
-	if len(errorValidators) != 0 {
-		c.JSON(http.StatusBadRequest, buildMessage("errors", errorValidators))
-		return nil
+	if u.Type != "" && !validator.IsTypeValid(u.Type) {
+		return c.JSON(http.StatusBadRequest, buildMessage("error", "Type must be a client or store"))
 	}
 
 	_user, err := h.userService.Update(*u)
