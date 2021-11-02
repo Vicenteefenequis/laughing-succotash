@@ -64,3 +64,15 @@ func (r *User) Get(id string) (*domain.User, error) {
 
 	return &domain.User{}, errors.New(apperrors.IllegalOperation, tx.Error, "User does not exists", "failed to get user on database")
 }
+
+func (r *User) FindAll() ([]domain.User, error) {
+	var users []domain.User
+
+	result := r.db.Find(&users)
+
+	if result.Error != nil {
+		return []domain.User{}, nil
+	}
+
+	return users, nil
+}
