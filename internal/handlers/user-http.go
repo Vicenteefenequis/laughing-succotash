@@ -4,20 +4,24 @@ import (
 	"github.com/labstack/echo/v4"
 	"laughing-succostash/internal/core/domain"
 	"laughing-succostash/internal/core/ports/service"
-	validator_port "laughing-succostash/internal/core/ports/validator"
+	"laughing-succostash/internal/validator"
 	"net/http"
 )
 
 type UserHTTPHandler struct {
 	userService service_port.User
-	validator   validator_port.UserValidator
 }
 
-func NewUserHttpHandler(bankService service_port.User, validator validator_port.UserValidator) *UserHTTPHandler {
+func NewUserHttpHandler(bankService service_port.User) *UserHTTPHandler {
 	return &UserHTTPHandler{
 		userService: bankService,
-		validator:   validator,
 	}
+}
+
+func ValidatorHandler(user *domain.User) []string {
+	_validator := validator.NewUserValidator()
+	errorValidators := _validator.Validate(user)
+	return errorValidators
 }
 
 func (h *UserHTTPHandler) Get(c echo.Context) error {
@@ -40,7 +44,7 @@ func (h *UserHTTPHandler) Create(c echo.Context) error {
 		return err
 	}
 
-	errorValidators := h.validator.Validate(u)
+	errorValidators := ValidatorHandler(u)
 
 	if len(errorValidators) != 0 {
 		c.JSON(http.StatusBadRequest, buildMessage("errors", errorValidators))
@@ -55,7 +59,7 @@ func (h *UserHTTPHandler) Create(c echo.Context) error {
 
 	c.JSON(http.StatusCreated, buildMessage("data", user))
 
-	return nil
+	return err
 }
 
 func (h *UserHTTPHandler) Delete(c echo.Context) error {
@@ -75,4 +79,30 @@ func (h *UserHTTPHandler) FindAll(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, buildMessage("data", users))
+}
+
+func (h *UserHTTPHandler) Update(c echo.Context) error {
+	u := new(domain.User)
+
+	if err := c.Bind(u); err != nil {
+		c.JSON(http.StatusBadRequest, buildMessage("error", err.Error()))
+		return err
+	}
+
+	errorValidators := ValidatorHandler(u)
+
+	if len(errorValidators) != 0 {
+		c.JSON(http.StatusBadRequest, buildMessage("errors", errorValidators))
+		return nil
+	}
+
+	_user, err := h.userService.Update(*u)
+
+	if err != nil {
+		return err
+	}
+
+	c.JSON(http.StatusCreated, buildMessage("data", _user))
+
+	return err
 }
