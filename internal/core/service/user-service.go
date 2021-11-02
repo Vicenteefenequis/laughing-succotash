@@ -55,6 +55,13 @@ func (u *User) Delete(id string) error {
 	return nil
 
 }
-func (u *User) Update(user domain.User, id string) (*domain.User, error) {
-	return nil, nil
+func (u *User) Update(user domain.User) (*domain.User, error) {
+
+	_user, err := u.repository.Save(user)
+
+	if err != nil {
+		return &domain.User{}, err
+	}
+
+	return _user, nil
 }
