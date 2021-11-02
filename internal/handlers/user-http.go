@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"laughing-succostash/internal/core/domain"
 	"laughing-succostash/internal/core/ports/service"
+	"laughing-succostash/internal/validator"
 	"net/http"
 )
 
@@ -35,6 +36,14 @@ func (h *UserHTTPHandler) Create(c echo.Context) error {
 	if err := c.Bind(u); err != nil {
 		c.JSON(http.StatusBadRequest, buildMessage("error", err.Error()))
 		return err
+	}
+
+	userValidator := validator.NewUserValidator()
+	errorValidators := userValidator.Validate(u)
+
+	if len(errorValidators) != 0 {
+		c.JSON(http.StatusBadRequest, buildMessage("errors", errorValidators))
+		return nil
 	}
 
 	user, err := h.userService.Create(*u)
