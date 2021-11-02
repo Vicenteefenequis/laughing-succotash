@@ -5,9 +5,9 @@ import (
 )
 
 type User interface {
-	Create(user domain.User) (*domain.User,error)
-	FindAll() ([]domain.User,error)
-	FindOne(id string) (*domain.User,error)
+	Create(user domain.User) (*domain.User, error)
+	FindAll() ([]domain.User, error)
+	FindOne(id string) (*domain.User, error)
 	Delete(id string) error
-	Update(user domain.User,id string) (*domain.User,error)
+	Update(user domain.User) (*domain.User, error)
 }
