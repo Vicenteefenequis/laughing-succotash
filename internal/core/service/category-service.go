@@ -26,8 +26,8 @@ func (u *Category) Create(category domain.Category) (*domain.Category, error) {
 	return categorySaved, nil
 }
 
-func (u *Category) FindAll() ([]domain.Category, error) {
-	_category, err := u.repository.FindAll()
+func (u *Category) FindAll(ids []string) ([]domain.Category, error) {
+	_category, err := u.repository.Get(ids)
 
 	if err != nil {
 		return []domain.Category{}, nil
@@ -36,13 +36,13 @@ func (u *Category) FindAll() ([]domain.Category, error) {
 	return _category, nil
 }
 
-func (u *Category) FindOne(id string) (*domain.Category, error) {
-	_category, err := u.repository.Get(id)
+func (u *Category) FindOne(ids []string) (*domain.Category, error) {
+	_category, err := u.repository.Get(ids)
 
 	if err != nil {
 		return &domain.Category{}, err
 	}
-	return _category, nil
+	return &_category[0], nil
 }
 
 func (u *Category) Delete(id string) error {
