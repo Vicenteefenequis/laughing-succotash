@@ -54,16 +54,24 @@ func (r *Category) Delete(id string) error {
 	return nil
 }
 
-func (r *Category) Get(id string) (*domain.Category, error) {
-	var category domain.Category
+func (r *Category) Get(ids []string) ([]domain.Category, error) {
+	var category []domain.Category
 
-	tx := r.db.First(&category, "id = ?", id)
-
-	if category.ID != "" {
-		return &category, nil
+	if len(ids) == 0 {
+		result := r.db.Find(&category)
+		if result.Error != nil {
+			return []domain.Category{}, errors.New(apperrors.EmptyResult, result.Error, "User empty result", "User empty result")
+		}
+		return category, nil
 	}
 
-	return &domain.Category{}, errors.New(apperrors.IllegalOperation, tx.Error, "User does not exists", "failed to get user on database")
+	tx := r.db.Find(&category, ids)
+
+	if len(category) != 0 {
+		return category, nil
+	}
+
+	return []domain.Category{}, errors.New(apperrors.IllegalOperation, tx.Error, "User does not exists", "failed to get user on database")
 }
 
 func (r *Category) FindAll() ([]domain.Category, error) {
