@@ -6,6 +6,7 @@ import (
 	"laughing-succostash/internal/core/ports/service"
 	"laughing-succostash/internal/validator"
 	"net/http"
+	"strings"
 )
 
 type UserHTTPHandler struct {
@@ -71,7 +72,9 @@ func (h *UserHTTPHandler) Delete(c echo.Context) error {
 }
 
 func (h *UserHTTPHandler) FindAll(c echo.Context) error {
-	users, err := h.userService.FindAll()
+	ids := getIdsParam(c.QueryParam("ids"))
+
+	users, err := h.userService.FindAll(ids)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, buildMessage("err", err.Error()))
@@ -104,4 +107,16 @@ func (h *UserHTTPHandler) Update(c echo.Context) error {
 	c.JSON(http.StatusCreated, buildMessage("data", _user))
 
 	return err
+}
+
+func getIdsParam(idsParam string) []string {
+	var ids []string
+
+	if idsParam != "" {
+		for _, id := range strings.Split(idsParam, ",") {
+			ids = append(ids, id)
+		}
+	}
+
+	return ids
 }
