@@ -19,15 +19,16 @@ func NewCategoryHttpHandler(categoryService service_port.Category) *CategoryHTTP
 }
 
 func (h *CategoryHTTPHandler) Get(c echo.Context) error {
-	user, err := h.categoryService.FindOne(c.Param("id"))
+	ids := getIdsParam(c.QueryParam("ids"))
+
+	categories, err := h.categoryService.FindOne(ids)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, buildMessage("error", err.Error()))
+		c.JSON(http.StatusBadRequest, buildMessage("err", err.Error()))
 		return err
 	}
 
-	c.JSON(http.StatusOK, user)
-	return nil
+	return c.JSON(http.StatusOK, buildMessage("data", categories))
 }
 
 func (h *CategoryHTTPHandler) Create(c echo.Context) error {
@@ -58,7 +59,9 @@ func (h *CategoryHTTPHandler) Delete(c echo.Context) error {
 }
 
 func (h *CategoryHTTPHandler) FindAll(c echo.Context) error {
-	categories, err := h.categoryService.FindAll()
+	ids := getIdsParam(c.QueryParam("ids"))
+
+	categories, err := h.categoryService.FindAll(ids)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, buildMessage("err", err.Error()))
