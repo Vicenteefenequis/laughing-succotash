@@ -54,11 +54,11 @@ func (r *Category) Delete(id string) error {
 	return nil
 }
 
-func (r *Category) Get(ids []string) ([]domain.Category, error) {
+func (r *Category) Get(ids []string, limit int, offset int) ([]domain.Category, error) {
 	var category []domain.Category
 
 	if len(ids) == 0 {
-		result := r.db.Find(&category)
+		result := r.db.Offset(offset).Limit(limit).Find(&category)
 		if result.Error != nil {
 			return []domain.Category{}, errors.New(apperrors.EmptyResult, result.Error, "User empty result", "User empty result")
 		}
