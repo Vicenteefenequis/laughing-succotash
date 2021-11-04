@@ -61,12 +61,16 @@ func (h *CategoryHTTPHandler) Delete(c echo.Context) error {
 func (h *CategoryHTTPHandler) FindAll(c echo.Context) error {
 	ids := getIdsParam(c.QueryParam("ids"))
 
-	categories, err := h.categoryService.FindAll(ids)
+	limit, offset := getPaginationParam(c)
+
+	categories, err := h.categoryService.FindAll(ids, limit, offset)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, buildMessage("err", err.Error()))
 		return err
 	}
+
+	setPagination(c, limit > len(categories))
 
 	return c.JSON(http.StatusOK, buildMessage("data", categories))
 }
