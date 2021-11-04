@@ -39,8 +39,8 @@ func setPagination(c echo.Context, isLast bool) {
 	limit := c.QueryParam("per_page")
 	page := c.QueryParam("page")
 
-	c.Response().Header().Set("X-Page-Num", limit)
-	c.Response().Header().Set("X-Page-Size", page)
+	c.Response().Header().Set("X-Page-Num", page)
+	c.Response().Header().Set("X-Page-Size", limit)
 
 	link := linkheader.Links{
 		{URL: "http://localhost:8080" + "?page=" + page + "&per_page=" + limit, Rel: "self"},
