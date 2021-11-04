@@ -20,7 +20,7 @@ func NewCategoryRouter(db *gorm.DB, e *echo.Echo) *Category {
 	}
 }
 
-func (u *Category) CategoryRouter() {
+func (u *Category) Router() {
 
 	repoCategory := repositories.NewCategoryRepository(u.db)
 	serviceCategory := service.NewCategoryService(repoCategory)

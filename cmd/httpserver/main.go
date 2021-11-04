@@ -20,11 +20,11 @@ func main() {
 	db := database.NewDatabase().Connect()
 	e := echo.New()
 
-	userRouter := routes.NewUserRouter(db, e)
-	userRouter.UserRouter()
+	user := routes.NewUserRouter(db, e)
+	user.Router()
 
-	categoryRouter := routes.NewCategoryRouter(db, e)
-	categoryRouter.CategoryRouter()
+	category := routes.NewCategoryRouter(db, e)
+	category.Router()
 
 	e.Logger.Fatal(e.Start(":8080"))
 

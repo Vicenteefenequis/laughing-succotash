@@ -20,7 +20,7 @@ func NewUserRouter(db *gorm.DB, e *echo.Echo) *User {
 	}
 }
 
-func (u *User) UserRouter() {
+func (u *User) Router() {
 
 	repoUser := repositories.NewUserRepository(u.db)
 	serviceUser := service.NewUserService(repoUser)
