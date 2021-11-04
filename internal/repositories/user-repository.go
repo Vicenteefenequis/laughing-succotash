@@ -54,13 +54,13 @@ func (r *User) Delete(id string) error {
 	return nil
 }
 
-func (r *User) Get(ids []string) ([]domain.User, error) {
+func (r *User) Get(ids []string, limit int, offset int) ([]domain.User, error) {
 	var users []domain.User
 
 	if len(ids) == 0 {
-		result := r.db.Find(&users)
-		if result.Error != nil {
-			return []domain.User{}, errors.New(apperrors.EmptyResult, result.Error, "User empty result", "User empty result")
+		err := r.db.Offset(offset).Limit(limit).Find(&users).Error
+		if err != nil {
+			return []domain.User{}, errors.New(apperrors.EmptyResult, err, "User empty result", "User empty result")
 		}
 		return users, nil
 	}
