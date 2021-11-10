@@ -13,10 +13,10 @@ type Category struct {
 	db *gorm.DB
 }
 
-func NewCategoryRouter(db *gorm.DB, e *echo.Echo) *Category {
+func NewCategoryRouter(routes *Routes) *Category {
 	return &Category{
-		db: db,
-		e:  e,
+		db: routes.db,
+		e:  routes.e,
 	}
 }
 
@@ -28,8 +28,7 @@ func (u *Category) Router() {
 
 	categoryRoutes := u.e.Group("category")
 	categoryRoutes.POST("", handlerCategory.Create)
-	categoryRoutes.GET("", handlerCategory.FindAll)
-	categoryRoutes.GET("/:id", handlerCategory.Get)
+	categoryRoutes.GET("", handlerCategory.Find)
 	categoryRoutes.DELETE("/:id", handlerCategory.Delete)
 	categoryRoutes.PUT("", handlerCategory.Update)
 }
