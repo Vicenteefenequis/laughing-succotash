@@ -27,19 +27,17 @@ func NewUserValidator() *UserValidator {
 	en := en.New()
 	uni = ut.New(en, en)
 	trans, _ := uni.GetTranslator("en")
-
-	return &UserValidator{
+	userValidator := &UserValidator{
 		validator: validator.New(),
 		trans:     &trans,
 	}
+	userValidator.RegisterTranslation()
+
+	return userValidator
 }
 
-func (u *UserValidator) Validate(user *domain.User) []string {
-	err := u.RegisterTranslation()
-
-	if err != nil {
-		return []string{err.Error()}
-	}
+func (u *UserValidator) Validate(field interface{}) []string {
+	user := field.(domain.User)
 
 	if !u.IsTypeValid(user.Type) {
 		return []string{"Type must be a client or store"}
@@ -50,7 +48,7 @@ func (u *UserValidator) Validate(user *domain.User) []string {
 		Type: user.Type,
 	}
 
-	err = u.validator.Struct(_user)
+	err := u.validator.Struct(_user)
 
 	var errorValidator []string
 
