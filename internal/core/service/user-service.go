@@ -26,7 +26,7 @@ func (u *User) Create(user domain.User) (*domain.User, error) {
 	return userSaved, nil
 }
 
-func (u *User) FindAll(ids []string, limit int, offset int) ([]domain.User, error) {
+func (u *User) Find(ids []string, limit int, offset int) ([]domain.User, error) {
 	_users, err := u.repository.Get(ids, limit, offset)
 
 	if err != nil {
@@ -34,15 +34,6 @@ func (u *User) FindAll(ids []string, limit int, offset int) ([]domain.User, erro
 	}
 
 	return _users, nil
-}
-
-func (u *User) FindOne(id string) (*domain.User, error) {
-	_user, err := u.repository.Get([]string{id}, 0, 0)
-
-	if err != nil {
-		return &domain.User{}, err
-	}
-	return &_user[0], nil
 }
 
 func (u *User) Delete(id string) error {

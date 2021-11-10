@@ -6,6 +6,7 @@ import (
 	"laughing-succostash/internal/core/service"
 	"laughing-succostash/internal/handlers"
 	"laughing-succostash/internal/repositories"
+	"laughing-succostash/internal/validator"
 )
 
 type User struct {
@@ -13,23 +14,22 @@ type User struct {
 	db *gorm.DB
 }
 
-func NewUserRouter(db *gorm.DB, e *echo.Echo) *User {
+func NewUserRouter(routes *Routes) *User {
 	return &User{
-		db: db,
-		e:  e,
+		db: routes.db,
+		e:  routes.e,
 	}
 }
 
 func (u *User) Router() {
-
 	repoUser := repositories.NewUserRepository(u.db)
 	serviceUser := service.NewUserService(repoUser)
-	handlerUser := handlers.NewUserHttpHandler(serviceUser)
+	validatorUser := validator.NewUserValidator()
+	handlerUser := handlers.NewUserHttpHandler(serviceUser, validatorUser)
 
 	userRoutes := u.e.Group("/user")
 	userRoutes.POST("", handlerUser.Create)
-	userRoutes.GET("", handlerUser.FindAll)
-	userRoutes.GET("/:id", handlerUser.Get)
+	userRoutes.GET("", handlerUser.Find)
 	userRoutes.DELETE("/:id", handlerUser.Delete)
 	userRoutes.PUT("", handlerUser.Update)
 }
