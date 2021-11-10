@@ -58,14 +58,14 @@ func (r *Category) Get(ids []string, limit int, offset int) ([]domain.Category, 
 	var category []domain.Category
 
 	if len(ids) == 0 {
-		result := r.db.Offset(offset).Limit(limit).Find(&category)
+		result := r.db.Offset(offset).Limit(limit).Preload("Products").Find(&category)
 		if result.Error != nil {
 			return []domain.Category{}, errors.New(apperrors.EmptyResult, result.Error, "User empty result", "User empty result")
 		}
 		return category, nil
 	}
 
-	tx := r.db.Find(&category, ids)
+	tx := r.db.Preload("Products").Find(&category, ids)
 
 	if len(category) != 0 {
 		return category, nil
