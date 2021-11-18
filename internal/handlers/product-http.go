@@ -4,28 +4,38 @@ import (
 	"github.com/labstack/echo/v4"
 	"laughing-succostash/internal/core/domain"
 	service_port "laughing-succostash/internal/core/ports/service"
+	validator_port "laughing-succostash/internal/core/ports/validator"
 	"net/http"
 )
 
 type ProductHttpHandler struct {
 	productService service_port.Product
+	validator      validator_port.Validator
 }
 
-func NewProductHttpHandler(productService service_port.Product) *ProductHttpHandler {
+func NewProductHttpHandler(productService service_port.Product, validator validator_port.Validator) *ProductHttpHandler {
 	return &ProductHttpHandler{
 		productService: productService,
+		validator:      validator,
 	}
 }
 
 func (h *ProductHttpHandler) Create(c echo.Context) error {
-	u := new(domain.Product)
+	p := new(domain.Product)
 
-	if err := c.Bind(u); err != nil {
+	if err := c.Bind(p); err != nil {
 		c.JSON(http.StatusBadRequest, buildMessage("error", err.Error()))
 		return err
 	}
 
-	product, err := h.productService.Create(*u)
+	errorsValidator := h.validator.Validate(*p)
+
+	if len(errorsValidator) != 0 {
+		c.JSON(http.StatusBadRequest, buildMessage("errors", errorsValidator))
+		return nil
+	}
+
+	product, err := h.productService.Create(*p)
 
 	if err != nil {
 		return err
@@ -67,6 +77,13 @@ func (h *ProductHttpHandler) Update(c echo.Context) error {
 	if err := c.Bind(u); err != nil {
 		c.JSON(http.StatusBadRequest, buildMessage("error", err.Error()))
 		return err
+	}
+
+	errorsValidator := h.validator.Validate(*u)
+
+	if len(errorsValidator) != 0 {
+		c.JSON(http.StatusBadRequest, buildMessage("errors", errorsValidator))
+		return nil
 	}
 
 	_product, err := h.productService.Update(*u)
