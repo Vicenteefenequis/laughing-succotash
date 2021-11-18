@@ -5,7 +5,6 @@ import (
 	"laughing-succostash/internal/core/domain"
 	"laughing-succostash/internal/core/ports/service"
 	validator_port "laughing-succostash/internal/core/ports/validator"
-	"laughing-succostash/internal/validator"
 	"net/http"
 )
 
@@ -80,10 +79,11 @@ func (h *UserHTTPHandler) Update(c echo.Context) error {
 		return err
 	}
 
-	validator := validator.NewUserValidator()
+	errorsValidator := h.validator.Validate(*u)
 
-	if u.Type != "" && !validator.IsTypeValid(u.Type) {
-		return c.JSON(http.StatusBadRequest, buildMessage("error", "Type must be a client or store"))
+	if len(errorsValidator) != 0 {
+		c.JSON(http.StatusBadRequest, buildMessage("errors", errorsValidator))
+		return nil
 	}
 
 	_user, err := h.userService.Update(*u)

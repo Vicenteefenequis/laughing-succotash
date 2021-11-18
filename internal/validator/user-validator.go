@@ -1,16 +1,8 @@
 package validator
 
 import (
-	"github.com/go-playground/locales/en"
-	"github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-	en_translations "github.com/go-playground/validator/v10/translations/en"
 	"laughing-succostash/internal/core/domain"
-)
-
-var (
-	uni      *ut.UniversalTranslator
-	validate *validator.Validate
 )
 
 type UserInput struct {
@@ -19,21 +11,13 @@ type UserInput struct {
 }
 
 type UserValidator struct {
-	validator *validator.Validate
-	trans     *ut.Translator
+	Validator
 }
 
 func NewUserValidator() *UserValidator {
-	en := en.New()
-	uni = ut.New(en, en)
-	trans, _ := uni.GetTranslator("en")
-	userValidator := &UserValidator{
-		validator: validator.New(),
-		trans:     &trans,
+	return &UserValidator{
+		*NewValidator(),
 	}
-	userValidator.RegisterTranslation()
-
-	return userValidator
 }
 
 func (u *UserValidator) Validate(field interface{}) []string {
@@ -63,35 +47,6 @@ func (u *UserValidator) Validate(field interface{}) []string {
 	}
 
 	return []string{}
-}
-
-func (u *UserValidator) RegisterTranslation() error {
-
-	err := en_translations.RegisterDefaultTranslations(u.validator, *u.trans)
-	if err != nil {
-		return err
-	}
-
-	err = u.RegisterTagRequired()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (u *UserValidator) RegisterTagRequired() error {
-	err := u.validator.RegisterTranslation("required", *u.trans, func(ut ut.Translator) error {
-		return ut.Add("required", "{0} must have a value!", true) // see universal-translator for details
-	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("required", fe.Field())
-		return t
-	})
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (u *UserValidator) IsTypeValid(_type domain.Type) bool {
