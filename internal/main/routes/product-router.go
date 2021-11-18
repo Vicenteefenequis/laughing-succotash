@@ -6,6 +6,7 @@ import (
 	"laughing-succostash/internal/core/service"
 	"laughing-succostash/internal/handlers"
 	"laughing-succostash/internal/repositories"
+	"laughing-succostash/internal/validator"
 )
 
 type Product struct {
@@ -23,7 +24,8 @@ func NewProductRouter(routes *Routes) *Product {
 func (u *Product) Router() {
 	repoProduct := repositories.NewProductRepository(u.db)
 	serviceProduct := service.NewProductService(repoProduct)
-	handlerProduct := handlers.NewProductHttpHandler(serviceProduct)
+	validatorProduct := validator.NewProductValidator()
+	handlerProduct := handlers.NewProductHttpHandler(serviceProduct, validatorProduct)
 
 	userRoutes := u.e.Group("/product")
 	userRoutes.POST("", handlerProduct.Create)
