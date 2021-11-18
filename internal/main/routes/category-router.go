@@ -6,6 +6,7 @@ import (
 	"laughing-succostash/internal/core/service"
 	"laughing-succostash/internal/handlers"
 	"laughing-succostash/internal/repositories"
+	"laughing-succostash/internal/validator"
 )
 
 type Category struct {
@@ -24,7 +25,8 @@ func (u *Category) Router() {
 
 	repoCategory := repositories.NewCategoryRepository(u.db)
 	serviceCategory := service.NewCategoryService(repoCategory)
-	handlerCategory := handlers.NewCategoryHttpHandler(serviceCategory)
+	validatorCategory := validator.NewCategoryValidator()
+	handlerCategory := handlers.NewCategoryHttpHandler(serviceCategory, validatorCategory)
 
 	categoryRoutes := u.e.Group("category")
 	categoryRoutes.POST("", handlerCategory.Create)
