@@ -1,20 +1,22 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"laughing-succostash/internal/core/domain"
 	service_port "laughing-succostash/internal/core/ports/service"
+	validator_port "laughing-succostash/internal/core/ports/validator"
 	"net/http"
 )
 
 type CategoryHTTPHandler struct {
 	categoryService service_port.Category
+	validator       validator_port.Validator
 }
 
-func NewCategoryHttpHandler(categoryService service_port.Category) *CategoryHTTPHandler {
+func NewCategoryHttpHandler(categoryService service_port.Category, validator validator_port.Validator) *CategoryHTTPHandler {
 	return &CategoryHTTPHandler{
 		categoryService: categoryService,
+		validator:       validator,
 	}
 }
 
@@ -24,6 +26,12 @@ func (h *CategoryHTTPHandler) Create(c echo.Context) error {
 	if err := c.Bind(category); err != nil {
 		c.JSON(http.StatusBadRequest, buildMessage("error", err.Error()))
 		return err
+	}
+	errorsValidator := h.validator.Validate(*category)
+
+	if len(errorsValidator) != 0 {
+		c.JSON(http.StatusBadRequest, buildMessage("errors", errorsValidator))
+		return nil
 	}
 
 	_category, err := h.categoryService.Create(*category)
@@ -46,11 +54,11 @@ func (h *CategoryHTTPHandler) Delete(c echo.Context) error {
 }
 
 func (h *CategoryHTTPHandler) Find(c echo.Context) error {
-	ids := getIdsParam(c.QueryParam("ids"))
+	names := getIdsParam(c.QueryParam("names"))
 
 	limit, offset := getPaginationParam(c)
 
-	categories, err := h.categoryService.Find(ids, limit, offset)
+	categories, err := h.categoryService.Find(names, limit, offset)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, buildMessage("err", err.Error()))
@@ -70,7 +78,12 @@ func (h *CategoryHTTPHandler) Update(c echo.Context) error {
 		return err
 	}
 
-	fmt.Println(*u)
+	errorsValidator := h.validator.Validate(*u)
+
+	if len(errorsValidator) != 0 {
+		c.JSON(http.StatusBadRequest, buildMessage("errors", errorsValidator))
+		return nil
+	}
 
 	_category, err := h.categoryService.Update(*u)
 
