@@ -65,23 +65,11 @@ func (r *Category) Get(ids []string, limit int, offset int) ([]domain.Category, 
 		return category, nil
 	}
 
-	tx := r.db.Preload("Products").Find(&category, ids)
+	tx := r.db.Preload("Products").Where("name IN ?", ids).Find(&category)
 
 	if len(category) != 0 {
 		return category, nil
 	}
 
 	return []domain.Category{}, errors.New(apperrors.IllegalOperation, tx.Error, "User does not exists", "failed to get user on database")
-}
-
-func (r *Category) FindAll() ([]domain.Category, error) {
-	var categories []domain.Category
-
-	result := r.db.Find(&categories)
-
-	if result.Error != nil {
-		return []domain.Category{}, errors.New(apperrors.EmptyResult, result.Error, "User empty result", "User empty result")
-	}
-
-	return categories, nil
 }
